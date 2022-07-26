@@ -8,6 +8,7 @@ You can assum all elements in the same dimension are of the same type/shape"""
 
 
 def matrix_transpose(matrix):
+    """return a new matrix"""
     m2 = []
     for i in range(len(matrix[0])):
         row = []

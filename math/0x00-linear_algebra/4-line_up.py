@@ -8,6 +8,7 @@ If arr1 and arr2 are not the same shape, return None"""
 
 
 def add_arrays(arr1, arr2):
+    """return a new list"""
     if len(arr1) != len(arr2):
         return None
     return list(map(lambda x: sum(x), zip(arr1, arr2)))
