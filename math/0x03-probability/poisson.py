@@ -5,9 +5,11 @@
 pi = 3.1415926536
 e = 2.7182818285
 
+
 def factorial(n):
     """Finds the factorial of a given number"""
     return 1 if (n == 1 or n == 0) else n * factorial(n - 1)
+
 
 class Poisson:
     """Represents a poisson distribution"""
