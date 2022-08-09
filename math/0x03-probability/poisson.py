@@ -2,6 +2,13 @@
 """Create a class Poisson that represents a poisson distribution"""
 
 
+pi = 3.1415926536
+e = 2.7182818285
+
+def factorial(n):
+    """Finds the factorial of a given number"""
+    return 1 if (n == 1 or n == 0) else n * factorial(n - 1)
+
 class Poisson:
     """Represents a poisson distribution"""
 
@@ -18,3 +25,14 @@ class Poisson:
             if len(data) < 2:
                 raise ValueError('data must contain multiple values')
             self.lambtha = sum(data) / len(data)
+
+    def pmf(self, k):
+        """Calculates the value of the PMF
+        for a given number of successes"""
+
+        if k < 0:
+            return 0
+        if type(k) != int:
+            k = int(k)
+        result = (e**(-self.lambtha) * self.lambtha**k) / factorial(k)
+        return result
