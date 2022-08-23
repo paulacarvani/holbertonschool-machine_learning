@@ -13,6 +13,11 @@ Returns the private attribute __A"""
 import numpy as np
 
 
+def sigmoid(y):
+    """Sigmoid Activation Function"""
+    return 1/(1+np.exp(-y))
+
+
 class Neuron:
     """That defines a single neuron performing binary classification"""
 
@@ -45,8 +50,3 @@ class Neuron:
         """Calculates the forward propagation of the neuron"""
         self.__A = sigmoid(np.matmul(self.__W, X) + self.__b)
         return self.__A
-
-
-# Sigmoid Activation Function
-def sigmoid(y):
-    return 1/(1+np.exp(-y))
