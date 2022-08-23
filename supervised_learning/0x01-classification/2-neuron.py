@@ -42,6 +42,7 @@ class Neuron:
         return self.__A
 
     def forward_prop(self, X):
+        """Calculates the forward propagation of the neuron"""
         self.__A = sigmoid(np.matmul(self.__W, X) + self.__b)
         return self.__A
 
