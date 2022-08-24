@@ -12,12 +12,12 @@ class NeuralNetwork:
         """class constructor"""
         if type(nx) != int:
             raise TypeError("nx must be an integer")
-        if nx <= 0:
+        if nx < 0:
             raise ValueError("nx must be a positive integer")
 
         if type(nodes) != int:
             raise TypeError("nodes must be an integer")
-        if nx <= 0:
+        if nx < 0:
             raise ValueError("nodes must be a positive integer")
 
         # Public instance attributes
