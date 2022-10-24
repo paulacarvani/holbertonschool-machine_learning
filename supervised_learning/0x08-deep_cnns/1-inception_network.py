@@ -1,62 +1,69 @@
 #!/usr/bin/env python3
 """
-fn that builds the inception network
+Making Inception Block
 """
-
 import tensorflow.keras as K
-
-
 inception_block = __import__('0-inception_block').inception_block
 
 
 def inception_network():
     """
-    You can assume the input data will have shape (224, 224, 3)
-    All convolutions inside and outside the inception block should
-        use a rectified linear activation (ReLU)
-    You may use inception_block =
-        __import__('0-inception_block').inception_block
-    Returns: the keras model
+    builds the inception network as described in Going Deeper
+    with Convolutions (2014)
     """
-    init = K.initializers.he_normal(seed=None)
-    input_Data = K.Input(shape=(224, 224, 3))
+    initializer = K.initializers.HeNormal()
+    input_layer = K.Input(shape=(224, 224, 3))
+    conv1 = K.layers.Conv2D(filters=64,
+                            padding='same',
+                            activation='relu',
+                            kernel_size=(7, 7),
+                            strides=(2, 2),
+                            kernel_initializer=initializer)(input_layer)
+    pool1 = K.layers.MaxPooling2D(pool_size=(3, 3),
+                                  strides=(2, 2),
+                                  padding='same')(conv1)
+    conv2 = K.layers.Conv2D(filters=192,
+                            kernel_size=(3, 3),
+                            strides=(1, 1),
+                            padding='same',
+                            kernel_initializer=initializer,
+                            activation='relu')(pool1)
+    pool2 = K.layers.MaxPooling2D(pool_size=(3, 3),
+                                  strides=(2, 2),
+                                  padding='same')(conv2)
+    filters = (64, 96, 128, 16, 32, 32)
+    inception1 = inception_block(pool2, filters)
+    filters = (128, 128, 192, 32, 96, 64)
+    inception2 = inception_block(inception1, filters)
+    pool3 = K.layers.MaxPooling2D(pool_size=(3, 3),
+                                  strides=(2, 2),
+                                  padding='same')(inception2)
+    filters = (192, 96, 208, 16, 48, 64)
+    inception3 = inception_block(pool3, filters)
+    filters = (160, 112, 224, 24, 64, 64)
+    inception4 = inception_block(inception3, filters)
+    filters = (128, 128, 256, 24, 64, 64)
+    inception5 = inception_block(inception4, filters)
+    filters = (112, 144, 288, 32, 64, 64)
+    inception6 = inception_block(inception5, filters)
+    filters = (256, 160, 320, 32, 128, 128)
+    inception7 = inception_block(inception6, filters)
+    pool4 = K.layers.MaxPooling2D(pool_size=(3, 3),
+                                  strides=(2, 2),
+                                  padding='same')(inception7)
+    filters = (256, 160, 320, 32, 128, 128)
+    inception8 = inception_block(pool4, filters)
+    filters = (384, 192, 384, 48, 128, 128)
+    inception9 = inception_block(inception8, filters)
+    avg_pool = K.layers.AveragePooling2D(pool_size=(7, 7),
+                                         strides=(1, 1),
+                                         padding='valid')(inception9)
+    dropout = K.layers.Dropout(rate=(0.4))(avg_pool)
+    fc = K.layers.Dense(units=(1000), activation='softmax',
+                        kernel_initializer=initializer)(dropout)
 
-    net = K.layers.Conv2D(filters=64, kernel_size=7, strides=2,
-                          padding='same', activation='relu',
-                          kernel_initializer=init)(input_Data)
-    net = K.layers.MaxPool2D(pool_size=3, strides=2,
-                             padding='same')(net)
-
-    net = K.layers.Conv2D(filters=64, kernel_size=1,
-                          padding='same', activation='relu',
-                          kernel_initializer=init)(net)
-    net = K.layers.Conv2D(filters=192, kernel_size=3,
-                          padding='same', activation='relu',
-                          kernel_initializer=init)(net)
-    net = K.layers.MaxPool2D(pool_size=3, strides=2,
-                             padding='same')(net)
-
-    net = inception_block(net, [64, 96, 128, 16, 32, 32])
-    net = inception_block(net, [128, 128, 192, 32, 96, 64])
-
-    net = K.layers.MaxPool2D(pool_size=3, strides=2,
-                             padding='same')(net)
-
-    net = inception_block(net, [192, 96, 208, 16, 48, 64])
-    net = inception_block(net, [160, 112, 224, 24, 64, 64])
-    net = inception_block(net, [128, 128, 256, 24, 64, 64])
-    net = inception_block(net, [112, 144, 288, 32, 64, 64])
-    net = inception_block(net, [256, 160, 320, 32, 128, 128])
-
-    net = K.layers.MaxPool2D(pool_size=3, strides=2,
-                             padding='same')(net)
-
-    net = inception_block(net, [256, 160, 320, 32, 128, 128])
-    net = inception_block(net, [384, 192, 384, 48, 128, 128])
-
-    avg_Pool = K.layers.AveragePooling2D(pool_size=7, strides=1)(net)
-
-    drop_Out = K.layers.Dropout(.4)(avg_Pool)
-    out_Data = K.layers.Dense(1000, activation='softmax',
-                              kernel_initializer=init)(drop_Out)
-    return K.Model(input_Data, out_Data)
+    model = K.Model(inputs=input_layer, outputs=fc)
+    model.compile(optimizer=K.optimizers.Adam(),
+                  loss='categorical_crossentropy',
+                  metrics=['accuracy'])
+    return model
