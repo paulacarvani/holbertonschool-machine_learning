@@ -1,0 +1,1 @@
+-- Write a SQL script that creates a table users following these requirements:
